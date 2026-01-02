@@ -53,8 +53,14 @@ with col1:
 with col2:
     st.subheader("Tiered Win Rates (SQL Logic)")
     # SQL-style aggregation
-    tiers = df.groupby(pd.cut(df['First_Half_Pts'], [0, 10, 20, 40])).Outcome.mean() * 100
+    # Fix: observed=False handles categorical grouping in newer Pandas
+    tiers = df.groupby(pd.cut(df['First_Half_Pts'], [0, 10, 20, 40]), observed=False).Outcome.mean() * 100
+    
+    # CRITICAL FIX: Convert the index (Intervals) to Strings so the chart can read them
+    tiers.index = tiers.index.astype(str) 
+    
     st.bar_chart(tiers)
+    st.info("Analysis: Teams show a 22% spike in win probability when stars cross the 20-point halftime threshold.")
     st.info("Analysis: Teams show a 22% spike in win probability when stars cross the 20-point halftime threshold.")
 
 st.markdown("---")
